@@ -153,7 +153,7 @@ paths:
         '500':
           description: Failed to delete video.
 
-  /get_video_url/{video_url}:  # Use curly braces for path parameters
+  /get_video_details_by_url/{video_url}:  # Use curly braces for path parameters
     get:
       summary: Get video details by URL
       description: Retrieve details of a specific video by its URL.
@@ -189,7 +189,7 @@ paths:
         '500':
           description: Failed to retrieve video details.
 
-  /update_video_url/{video_url}:  # Use curly braces for path parameters
+  /update_video_by_url/{video_url}:  # Use curly braces for path parameters
     put:
       summary: Update video details by URL
       description: Update the transcript of a specific video by its URL.
@@ -220,7 +220,7 @@ paths:
         '500':
           description: Failed to update video details.
 
-  /delete_video_url/{video_url}:  # Use curly braces for path parameters
+  /delete_video_by_url/{video_url}:  # Use curly braces for path parameters
     delete:
       summary: Delete video by URL
       description: Delete a specific video by its URL.
