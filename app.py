@@ -44,11 +44,11 @@ def allowed_video_file(filename):
 @app.route('/api/submit_record', methods=['POST'])
 def submit_record():
     try:
+        file = request.files.get('file')
+        
         # Check if the POST request has a file part
         if 'file' not in request.files:
-            return jsonify({'error': 'No file part'}), 400
-
-        file = request.files['file']
+            return jsonify({'error': 'No file uploaded'}), 400
 
         # If the user does not select a file, the browser may send an empty file without a filename
         if file.filename == '':
