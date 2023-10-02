@@ -3,7 +3,7 @@ import uuid
 import smtplib
 import subprocess
 import io
-import openai
+#import openai
 from flask import Flask, request, jsonify, send_from_directory, current_app
 from werkzeug.utils import secure_filename
 from models import db, SavedVideo
