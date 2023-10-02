@@ -4,4 +4,4 @@ SQLAlchemy
 SpeechRecognition
 gunicorn
 moviepy
-openai-whisper
+#openai-whisper
