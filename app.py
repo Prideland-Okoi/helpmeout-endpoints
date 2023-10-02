@@ -17,7 +17,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///your_database.db'
 app.config['SECRET_KEY'] = 'your_secret_key_here'
 app.config['UPLOAD_FOLDER'] = 'videos'
 
-openai.api_key = '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'
+#openai.api_key = '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'
 
 
 # Initialize the database
