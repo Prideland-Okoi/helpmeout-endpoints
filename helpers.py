@@ -23,3 +23,14 @@ def transcribe_audio(audio_path):
     except Exception as e:
         return str(e)
 
+def extract_name_from_url(video_url):
+    # Split the UUID using "com/" as the separator and take the second part
+    parts = url.split("com/")
+    
+    if len(parts) == 2:
+        return parts[1]
+    elif len(parts) >= 3:
+        return parts[-1]
+    else:
+        return None
+
