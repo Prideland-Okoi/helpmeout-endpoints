@@ -1,0 +1,388 @@
+swagger: '2.0'
+info:
+  title: Video Processing and Management API
+  description: This API allows you to submit, retrieve, update, and delete videos, as well as perform various video processing tasks such as cutting and concatenating videos.
+  version: 1.0.0
+host: helpmeout-endpoints.onrender.com
+basePath: /api
+schemes:
+  - https
+  - http
+security:
+  - api_key: []
+paths:
+  /submit_record:
+    post:
+      summary: Submit a video record
+      description: Submit a video for processing, which includes video compression, audio transcription, and saving to the database.
+      parameters:
+        - name: file
+          in: formData
+          description: The video file to be submitted.
+          required: true
+          type: file
+      responses:
+        '200':
+          description: Video successfully submitted, processed, and saved.
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              video_url:
+                type: string
+        '400':
+          description: Invalid request format or missing file part.
+        '500':
+          description: Failed to save the video to the database.
+
+  /get_all_videos:
+    get:
+      summary: Get all videos
+      description: Retrieve a list of all saved videos from the database.
+      responses:
+        '200':
+          description: List of videos successfully retrieved.
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+                video_url:
+                  type: string
+                transcript:
+                  type: string
+                date_created:
+                  type: string
+                video_size_mb:
+                  type: number
+        '500':
+          description: Failed to retrieve videos from the database.
+
+  /get_video/{name}:  # Use curly braces for path parameters
+    get:
+      summary: Get video details by name
+      description: Retrieve details of a specific video by its name.
+      parameters:
+        - name: name
+          in: path
+          description: The name of the video to get details for.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Video details successfully retrieved.
+          schema:
+            type: object
+            properties:
+              video:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  video_url:
+                    type: string
+                  transcript:
+                    type: string
+                  date_created:
+                    type: string
+                  video_size_mb:
+                    type: number
+        '404':
+          description: Video with the specified name not found.
+        '500':
+          description: Failed to retrieve video details.
+
+  /put_video/{name}:  # Use curly braces for path parameters
+    put:
+      summary: Update video details by name
+      description: Update the transcript of a specific video by its name.
+      parameters:
+        - name: name
+          in: path
+          description: The name of the video to update.
+          required: true
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transcript:
+                  type: string
+      responses:
+        '200':
+          description: Video details updated successfully.
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        '404':
+          description: Video with the specified name not found.
+        '500':
+          description: Failed to update video details.
+
+  /delete_video/{name}:  # Use curly braces for path parameters
+    delete:
+      summary: Delete video by name
+      description: Delete a specific video by its name.
+      parameters:
+        - name: name
+          in: path
+          description: The name of the video to delete.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Video deleted successfully.
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        '404':
+          description: Video with the specified name not found.
+        '500':
+          description: Failed to delete video.
+
+  /get_video_url/{video_url}:  # Use curly braces for path parameters
+    get:
+      summary: Get video details by URL
+      description: Retrieve details of a specific video by its URL.
+      parameters:
+        - name: video_url
+          in: path
+          description: The URL of the video to get details for.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Video details successfully retrieved.
+          schema:
+            type: object
+            properties:
+              video:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  video_url:
+                    type: string
+                  transcript:
+                    type: string
+                  date_created:
+                    type: string
+                  video_size_mb:
+                    type: number
+        '404':
+          description: Video with the specified URL not found.
+        '500':
+          description: Failed to retrieve video details.
+
+  /update_video_url/{video_url}:  # Use curly braces for path parameters
+    put:
+      summary: Update video details by URL
+      description: Update the transcript of a specific video by its URL.
+      parameters:
+        - name: video_url
+          in: path
+          description: The URL of the video to update.
+          required: true
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transcript:
+                  type: string
+      responses:
+        '200':
+          description: Video details updated successfully.
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        '404':
+          description: Video with the specified URL not found.
+        '500':
+          description: Failed to update video details.
+
+  /delete_video_url/{video_url}:  # Use curly braces for path parameters
+    delete:
+      summary: Delete video by URL
+      description: Delete a specific video by its URL.
+      parameters:
+        - name: video_url
+          in: path
+          description: The URL of the video to delete.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Video deleted successfully.
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        '404':
+          description: Video with the specified URL not found.
+        '500':
+          description: Failed to delete video.
+
+  /cut_video/{video_name}:
+    put:
+      summary: Cut and process a video
+      description: Cuts a video from start_time to end_time and performs processing.
+      parameters:
+        - name: video_name
+          in: path
+          description: The name of the video to be cut and processed.
+          required: true
+          type: string
+        - name: start_time
+          in: query
+          description: The start time for cutting the video.
+          required: true
+          type: number
+        - name: end_time
+          in: query
+          description: The end time for cutting the video.
+          required: true
+          type: number
+      responses:
+        200:
+          description: Video cut and updated successfully.
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              video_url:
+                type: string
+        400:
+          description: Invalid request format or missing parameters.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+        404:
+          description: Video not found.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+        500:
+          description: Internal server error.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+      consumes:
+        - application/json
+      produces:
+        - application/json
+  /concatenate_videos:
+    post:
+      summary: Concatenate and process videos
+      description: Concatenate multiple videos into one and perform processing.
+      parameters:
+        - name: video_files
+          in: formData
+          description: List of video files to concatenate.
+          required: true
+          type: array
+          items:
+            type: file
+      responses:
+        200:
+          description: Concatenated video received and saved successfully.
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              video_url:
+                type: string
+        400:
+          description: Invalid request format or missing video files.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+        500:
+          description: Internal server error.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+
+  /submit_to_email/{video_name}:
+    post:
+      summary: Submit video to email
+      description: Submit a video to an email address.
+      parameters:
+        - name: video_name
+          in: path
+          description: The name of the video to submit.
+          required: true
+          type: string
+        - name: video_submission
+          in: body
+          description: Video submission data including name and email.
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              email:
+                type: string
+      responses:
+        200:
+          description: Email sent successfully.
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        404:
+          description: Video with the specified name not found.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+        500:
+          description: Internal server error.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+      consumes:
+        - application/json
+      produces:
+        - application/json
