@@ -44,74 +44,55 @@ def allowed_video_file(filename):
 @app.route('/api/submit_record', methods=['POST'])
 def submit_record():
     try:
-        file = request.files.get('file')
-        
-        # Check if the POST request has a file part
         if 'file' not in request.files:
-            return jsonify({'error': 'No file uploaded'}), 400
+        return jsonify({"error": "No file part"}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
 
-        # If the user does not select a file, the browser may send an empty file without a filename
-        if file.filename == '':
-            return jsonify({'error': 'No selected file'}), 400
+    filename = secure_filename(file.filename)
+    file_extension = os.path.splitext(filename)[1]
 
-        # Check if the file has an allowed extension
-        if not allowed_video_file(file.filename):
-            return jsonify({'error': 'File extension not allowed'}), 400
+    # Check if the file extension is allowed
+    if not allowed_video_file(filename):
+        return jsonify({"error": f"File extension {file_extension} is not allowed"}), 400
 
-        # Get the secure filename for the uploaded file
-        filename = secure_filename(file.filename)
+     # Generate a UUID for the video URL
+    video_uuid = str(uuid.uuid4())
 
-        # Generate a UUID for the video URL
-        video_uuid = str(uuid.uuid4())
+    # Replace the original filename with the UUID
+    filename = f"{video_uuid}.{file_extension}"
 
-        # Construct a new file name using the UUID and the allowed extension
-        filename = f'{video_uuid}.{file.filename.rsplit(".", 1)[1].lower()}'
+    # Save the file to the upload folder
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file.save(file_path)
 
-        # Save the uploaded video to a temporary location
-        temp_video_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        # temp_video_path = os.path.abspath(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    # Update the SavedVideo object with the new filename
+    saved_video=SavedVideo()
+    saved_video.name = filename
+    saved_video.video_file = open(file_path, 'rb').read()
+    saved_video.video_url = f'helpmeout-endpoints.onrender.com/{filename}'
+    db.session.commit()
+    # Check if the date_created field is None
+    if saved_video.date_created is not None:
+        date_created_string = saved_video.date_created.isoformat()
+    else:
+        date_created_string = None
+    os.remove(file_path)
+    # Calculate the video size in megabytes
+    video_size_mb = len(saved_video.video_file) / \
+    (1024 * 1024)  # Bytes to Megabytes
 
-        file.save(temp_video_path)
+    video_data = {
+                'id': saved_video.id,
+                'name': saved_video.name,
+                'video_url': saved_video.video_url,
+                'transcript': saved_video.transcript,
+                'date_created': date_created_string,
+                'video_size_mb': video_size_mb,
+            }
 
-        # Create a VideoFileClip object for the uploaded video
-        video = VideoFileClip(temp_video_path)
-        # Define the output path for the compressed video
-        compressed_video_path = os.path.join(
-            app.config['UPLOAD_FOLDER'], 'compressed_' + filename)
-        compressed_video = video.write_videofile(
-            compressed_video_path, bitrate="500k")
-
-        # Close the VideoFileClip objects
-        # video.close()
-        # compressed_video.close()
-
-        # Transcribe the video's audio using Openai Whisper ASR
-        # audio_file= open(compressed_video_path, "rb")
-        # response = openai.Audio.transcribe(
-        #     "whisper-1",
-        #     audio_file,
-        #     language="en-US",
-        # )
-
-        # # Extract the transcribed text from the API response
-        # audio_transcript = response['text']
-
-        # Transcribe the video's audio content using sr
-        audio_transcript = transcribe_audio(compressed_video_path)
-
-        # Use the save_video_to_database function
-        saved_video = SavedVideo()
-        vide = open(compressed_video_path, 'rb').read()
-        url = f'https://helpmeout-endpoints.onrender.com/{video_uuid}'
-
-        if saved_video.save_video_to_database(filename, vide, url, audio_transcript):
-            # Delete the temporary file after saving to the database
-            os.remove(compressed_video_path)
-            os.remove(temp_video_path)
-            return jsonify({
-                'message': 'Recorded content received successfully',
-                'video_url': f'https://helpmeout-endpoints.onrender.com/{video_uuid}'
-            }), 200
+    return jsonify({"message": f"File {filename} uploaded successfully!",'videos': video_data}), 201
         else:
             return jsonify({'error': 'Failed to save video to the database'}), 500
     except Exception as e:
