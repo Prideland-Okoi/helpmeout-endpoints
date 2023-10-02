@@ -217,8 +217,11 @@ def delete_video(name):
 @app.route('/api/get_video/<video_url>', methods=['GET'])
 def get_video_details_by_url(video_url):
     try:
-        # Query the database for the video with the specified URL
-        video = SavedVideo.query.filter_by(video_url=video_url).first()
+       # Use the extracted video_url in your logic
+        extracted_video_url = extract_url_from_video_url(video_url)
+
+        # Query the database for the video with the extracted URL
+        video = SavedVideo.query.filter_by(video_url=extracted_video_url).first()
 
         if not video:
             return jsonify({'error': 'Video not found'}), 404
@@ -246,8 +249,11 @@ def get_video_details_by_url(video_url):
 @app.route('/api/update_video/<video_url>', methods=['PUT'])
 def update_video_details_by_url(video_url):
     try:
-        # Query the database for the video with the specified URL
-        video = SavedVideo.query.filter_by(video_url=video_url).first()
+        # Use the extracted video_url in your logic
+        extracted_video_url = extract_url_from_video_url(video_url)
+
+        # Query the database for the video with the extracted URL
+        video = SavedVideo.query.filter_by(video_url=extracted_video_url).first()
 
         if not video:
             return jsonify({'error': 'Video not found'}), 404
@@ -269,8 +275,11 @@ def update_video_details_by_url(video_url):
 @app.route('/api/delete_video/<video_url>', methods=['DELETE'])
 def delete_video_by_url(video_url):
     try:
-        # Query the database for the video with the specified URL
-        video = SavedVideo.query.filter_by(video_url=video_url).first()
+        # Use the extracted video_url in your logic
+        extracted_video_url = extract_url_from_video_url(video_url)
+
+        # Query the database for the video with the extracted URL
+        video = SavedVideo.query.filter_by(video_url=extracted_video_url).first()
 
         if not video:
             return jsonify({'error': 'Video not found'}), 404
