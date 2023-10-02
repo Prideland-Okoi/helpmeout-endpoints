@@ -68,12 +68,12 @@ def submit_record():
         file.save(file_path)
 
         # Create a VideoFileClip object for the uploaded video
-        video = VideoFileClip(file_path)
+        # video = VideoFileClip(file_path)
         # Define the output path for the compressed video
-        compressed_video_path = os.path.join(
-            app.config['UPLOAD_FOLDER'], 'compressed_' + filename)
-        compressed_video = video.write_videofile(
-            compressed_video_path, bitrate="500k")
+        # compressed_video_path = os.path.join(
+        #     app.config['UPLOAD_FOLDER'], 'compressed_' + filename)
+        # compressed_video = video.write_videofile(
+        #     compressed_video_path, bitrate="500k")
         # Transcribe the video's audio using Openai Whisper ASR
         # audio_file= open(compressed_video_path, "rb")
         # response = openai.Audio.transcribe(
@@ -91,7 +91,7 @@ def submit_record():
         # Update the SavedVideo object with the new filename
         saved_video=SavedVideo()
         saved_video.name = filename
-        saved_video.video_file = open(compressed_video_path, 'rb').read()
+        saved_video.video_file = open(file_path, 'rb').read()
         saved_video.video_url = f'helpmeout-endpoints.onrender.com/{filename}'
         #saved_video.transcript = audio_transcript
         db.session.commit()
