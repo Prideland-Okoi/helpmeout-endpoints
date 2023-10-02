@@ -218,7 +218,7 @@ def delete_video(name):
 def get_video_details_by_url(video_url):
     try:
        # Use the extracted video_url in your logic
-        extracted_video_url = extract_url_from_video_url(video_url)
+        extracted_video_url = extract_name_from_url(video_url)
 
         # Query the database for the video with the extracted URL
         video = SavedVideo.query.filter_by(video_url=extracted_video_url).first()
@@ -250,7 +250,7 @@ def get_video_details_by_url(video_url):
 def update_video_details_by_url(video_url):
     try:
         # Use the extracted video_url in your logic
-        extracted_video_url = extract_url_from_video_url(video_url)
+        extracted_video_url = extract_name_from_url(video_url)
 
         # Query the database for the video with the extracted URL
         video = SavedVideo.query.filter_by(video_url=extracted_video_url).first()
@@ -276,7 +276,7 @@ def update_video_details_by_url(video_url):
 def delete_video_by_url(video_url):
     try:
         # Use the extracted video_url in your logic
-        extracted_video_url = extract_url_from_video_url(video_url)
+        extracted_video_url = extract_name_from_url(video_url)
 
         # Query the database for the video with the extracted URL
         video = SavedVideo.query.filter_by(video_url=extracted_video_url).first()
