@@ -61,7 +61,7 @@ def submit_record():
         video_uuid = str(uuid.uuid4())
 
         # Replace the original filename with the UUID
-        filename = f"{video_uuid}.{file_extension}"
+        filename = f"{video_uuid}{file_extension}"
 
         # Save the file to the upload folder
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -89,11 +89,13 @@ def submit_record():
         #audio_transcript = transcribe_audio(compressed_video_path)
 
         # Update the SavedVideo object with the new filename
-        saved_video=SavedVideo()
-        saved_video.name = filename
-        saved_video.video_file = open(file_path, 'rb').read()
-        saved_video.video_url = f'helpmeout-endpoints.onrender.com/{filename}'
-        #saved_video.transcript = audio_transcript
+        # saved_video=SavedVideo()
+        # saved_video.name = filename
+        # saved_video.video_file = open(file_path, 'rb').read()
+        # saved_video.video_url = f'helpmeout-endpoints.onrender.com/{filename}'
+        # saved_video.transcript = audio_transcript
+        saved_video = SavedVideo(name=filename, video_file=open(file_path, 'rb').read(), video_url=f'helpmeout-endpoints.onrender.com/{filename}')
+        db.session.add(saved_video)
         db.session.commit()
         # Check if the date_created field is None
         if saved_video.date_created is not None:
