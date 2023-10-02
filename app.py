@@ -86,14 +86,14 @@ def submit_record():
         # audio_transcript = response['text']
 
         # Transcribe the video's audio content using sr
-        audio_transcript = transcribe_audio(compressed_video_path)
+        #audio_transcript = transcribe_audio(compressed_video_path)
 
         # Update the SavedVideo object with the new filename
         saved_video=SavedVideo()
         saved_video.name = filename
         saved_video.video_file = open(compressed_video_path, 'rb').read()
         saved_video.video_url = f'helpmeout-endpoints.onrender.com/{filename}'
-        saved_video.transcript = audio_transcript
+        #saved_video.transcript = audio_transcript
         db.session.commit()
         # Check if the date_created field is None
         if saved_video.date_created is not None:
