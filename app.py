@@ -99,7 +99,7 @@ def submit_record():
         # Use the save_video_to_database function
         saved_video = SavedVideo()
         vide = open(compressed_video_path, 'rb').read()
-        url = f'https://HelpMeOut.com/videos/{video_uuid}'
+        url = f'https://helpmeout-endpoints.onrender.com/{video_uuid}'
 
         if saved_video.save_video_to_database(filename, vide, url, audio_transcript):
             # Delete the temporary file after saving to the database
@@ -107,7 +107,7 @@ def submit_record():
             os.remove(temp_video_path)
             return jsonify({
                 'message': 'Recorded content received successfully',
-                'video_url': f'https://HelpMeOut.com/videos/{video_uuid}'
+                'video_url': f'https://helpmeout-endpoints.onrender.com/{video_uuid}'
             }), 200
         else:
             return jsonify({'error': 'Failed to save video to the database'}), 500
@@ -333,7 +333,7 @@ def cut_video(video_name):
         # Return the URL of the updated video
         return jsonify({
             "message": "Video cut and updated successfully",
-            "video_url": f"https://HelpMeOut.com/videos/{video_name}",
+            "video_url": f"https://helpmeout-endpoints.onrender.com/{video_name}",
         })
 
     except Exception as e:
@@ -387,7 +387,7 @@ def concatenate_videos():
         # Use the save_video_to_database function
         saved_video = SavedVideo()
         video_bytes = open(concatenated_video_path, 'rb').read()
-        video_url = f'https://HelpMeOut.com/videos/{concatenated_video_uuid}'
+        video_url = f'https://helpmeout-endpoints.onrender.com/{concatenated_video_uuid}'
 
         if saved_video.save_video_to_database(concatenated_filename, video_bytes, video_url, audio_transcript):
             return jsonify({
