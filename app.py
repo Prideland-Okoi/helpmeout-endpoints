@@ -123,7 +123,7 @@ def submit_record():
 def get_all_videos():
     try:
         # Get all videos from the database.
-        videos = SavedVideo.query.all()
+        video = SavedVideo.query.all()
 
         video_data = []
 
