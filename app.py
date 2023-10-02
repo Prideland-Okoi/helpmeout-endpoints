@@ -220,7 +220,7 @@ def delete_video(name):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/api/get_video/<video_url>', methods=['GET'])
+@app.route('/api/get_video_url/<video_url>', methods=['GET'])
 def get_video_details_by_url(video_url):
     try:
        # Use the extracted video_url in your logic
@@ -252,7 +252,7 @@ def get_video_details_by_url(video_url):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/api/update_video/<video_url>', methods=['PUT'])
+@app.route('/api/update_video_url/<video_url>', methods=['PUT'])
 def update_video_details_by_url(video_url):
     try:
         # Use the extracted video_url in your logic
@@ -278,7 +278,7 @@ def update_video_details_by_url(video_url):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/api/delete_video/<video_url>', methods=['DELETE'])
+@app.route('/api/delete_video_url/<video_url>', methods=['DELETE'])
 def delete_video_by_url(video_url):
     try:
         # Use the extracted video_url in your logic
