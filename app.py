@@ -58,6 +58,9 @@ def submit_record():
         if not allowed_video_file(file.filename):
             return jsonify({'error': 'File extension not allowed'}), 400
 
+        # Get the secure filename for the uploaded file
+        filename = secure_filename(file.filename)
+
         # Generate a UUID for the video URL
         video_uuid = str(uuid.uuid4())
 
