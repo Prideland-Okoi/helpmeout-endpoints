@@ -220,21 +220,26 @@ def delete_video(name):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/api/get_video_url/<video_url>', methods=['GET'])
-def get_video_details_by_url(video_url):
+@app.route('/api/get_video_url', methods=['POST'])
+def get_video_details_by_url():
     try:
-       # Use the extracted video_url in your logic
-        extracted_video_url = extract_name_from_url(video_url)
+        data = request.get_json()
+        video_url = data.get('video_url')
 
-        # Query the database for the video with the extracted URL
-        video = SavedVideo.query.filter_by(video_url=extracted_video_url).first()
+        if not video_url:
+            return jsonify({'error': 'Missing "video_url" in JSON data'}), 400
+
+        parts = video_url.split("com/")
+
+        if len(parts) == 2:
+            extract = str(parts[1])
+            video = SavedVideo.query.filter_by(name=extract).first()
 
         if not video:
             return jsonify({'error': 'Video not found'}), 404
 
         # Calculate the video size in megabytes
-        video_size_mb = len(video.video_file) / \
-            (1024 * 1024)  # Bytes to Megabytes
+        video_size_mb = len(video.video_file) / (1024 * 1024)  # Bytes to Megabytes
 
         # Prepare the video data response
         video_data = {
@@ -248,8 +253,12 @@ def get_video_details_by_url(video_url):
 
         # Return the video data as a JSON response
         return jsonify({'video': video_data}), 200
+    except KeyError as e:
+        return jsonify({'error': f'Missing key in JSON data: {str(e)}'}), 400
+    except SQLAlchemyError as e:
+        return jsonify({'error': f'Database error: {str(e)}'}), 500
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': f'An unexpected error occurred: {str(e)}'}), 500
 
 
 @app.route('/api/update_video_url/<video_url>', methods=['PUT'])
@@ -259,7 +268,7 @@ def update_video_details_by_url(video_url):
         extracted_video_url = extract_name_from_url(video_url)
 
         # Query the database for the video with the extracted URL
-        video = SavedVideo.query.filter_by(video_url=extracted_video_url).first()
+        video = SavedVideo.query.filter_by(name=extracted_video_url).first()
 
         if not video:
             return jsonify({'error': 'Video not found'}), 404
@@ -285,7 +294,7 @@ def delete_video_by_url(video_url):
         extracted_video_url = extract_name_from_url(video_url)
 
         # Query the database for the video with the extracted URL
-        video = SavedVideo.query.filter_by(video_url=extracted_video_url).first()
+        video = SavedVideo.query.filter_by(name=extracted_video_url).first()
 
         if not video:
             return jsonify({'error': 'Video not found'}), 404
