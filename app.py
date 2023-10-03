@@ -1,15 +1,11 @@
-import os
-import uuid
-import smtplib
-import subprocess
-import io
+import os, uuid, smtplib, subprocess, io
 #import openai
 from flask import Flask, request, jsonify, send_from_directory, current_app
 from werkzeug.utils import secure_filename
 from models import db, SavedVideo
 from helpers import *
 from datetime import datetime
-from moviepy.editor import VideoFileClip, concatenate_videoclips, clips_array
+#from moviepy.editor import VideoFileClip, concatenate_videoclips, clips_array
 from email.mime.text import MIMEText
 
 app = Flask(__name__)
@@ -18,7 +14,6 @@ app.config['SECRET_KEY'] = 'your_secret_key_here'
 app.config['UPLOAD_FOLDER'] = 'videos'
 
 #openai.api_key = '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'
-
 
 # Initialize the database
 db.init_app(app)
@@ -44,8 +39,6 @@ def allowed_video_file(filename):
 @app.route('/api/submit_record', methods=['POST'])
 def submit_record():
     try:
-        if 'file' not in request.files:
-            return jsonify({"error": "No file part"}), 400
         file = request.files['file']
         if file.filename == '':
             return jsonify({"error": "No selected file"}), 400
@@ -67,33 +60,6 @@ def submit_record():
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
 
-        # Create a VideoFileClip object for the uploaded video
-        # video = VideoFileClip(file_path)
-        # Define the output path for the compressed video
-        # compressed_video_path = os.path.join(
-        #     app.config['UPLOAD_FOLDER'], 'compressed_' + filename)
-        # compressed_video = video.write_videofile(
-        #     compressed_video_path, bitrate="500k")
-        # Transcribe the video's audio using Openai Whisper ASR
-        # audio_file= open(compressed_video_path, "rb")
-        # response = openai.Audio.transcribe(
-        #     "whisper-1",
-        #     audio_file,
-        #     language="en-US",
-        # )
-
-        # # Extract the transcribed text from the API response
-        # audio_transcript = response['text']
-
-        # Transcribe the video's audio content using sr
-        #audio_transcript = transcribe_audio(compressed_video_path)
-
-        # Update the SavedVideo object with the new filename
-        # saved_video=SavedVideo()
-        # saved_video.name = filename
-        # saved_video.video_file = open(file_path, 'rb').read()
-        # saved_video.video_url = f'helpmeout-endpoints.onrender.com/{filename}'
-        # saved_video.transcript = audio_transcript
         saved_video = SavedVideo(name=filename, video_file=open(file_path, 'rb').read(), video_url=f'helpmeout-endpoints.onrender.com/{filename}')
         db.session.add(saved_video)
         db.session.commit()
@@ -178,7 +144,7 @@ def get_video_details(name):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/api/get_video/<name>', methods=['PUT'])
+@app.route('/api/edit_name_transcript/<name>', methods=['PUT'])
 def update_video_details(name):
     try:
         # Query the database for the video with the specified name
@@ -189,8 +155,31 @@ def update_video_details(name):
 
         # Update video details based on the PUT request data
         data = request.get_json()
+        if 'transcript' and 'name' in data:
+            video.transcript = data.get('transcript')
+            video.name = data.get('name')
+
+        # Commit the changes to the database
+        db.session.commit()
+
+        # Return a success message
+        return jsonify({'message': 'Video details updated successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/edit_transcript/<name>', methods=['PUT'])
+def update_video_detail(name):
+    try:
+        # Query the database for the video with the specified name
+        video = SavedVideo.query.filter_by(name=name).first()
+
+        if not video:
+            return jsonify({'error': 'Video not found'}), 404
+
+        # Update video details based on the PUT request data
+        data = request.get_json()
         if 'transcript' in data:
-            video.transcript = data['transcript']
+            video.transcript = data.get('transcript')
 
         # Commit the changes to the database
         db.session.commit()
@@ -261,22 +250,22 @@ def get_video_details_by_url():
         return jsonify({'error': f'An unexpected error occurred: {str(e)}'}), 500
 
 
-@app.route('/api/update_video_url/<video_url>', methods=['PUT'])
-def update_video_details_by_url(video_url):
+@app.route('/api/helpmeout-endpoints.onrender.com/<video_url>', methods=['PUT'])
+def update_video_details_by_url(name):
     try:
-        # Use the extracted video_url in your logic
-        extracted_video_url = extract_name_from_url(video_url)
-
+        
         # Query the database for the video with the extracted URL
-        video = SavedVideo.query.filter_by(name=extracted_video_url).first()
+        video = SavedVideo.query.filter_by(name).first()
 
         if not video:
             return jsonify({'error': 'Video not found'}), 404
 
         # Update video details based on the PUT request data
         data = request.get_json()
-        if 'transcript' in data:
-            video.transcript = data['transcript']
+        if 'transcript' and 'name' in data:
+            video.transcript = data.get('transcript')
+            name = data.get('name')
+        video.video_url = f"helpmeout-endpoints.onrender.com/{name}"
 
         # Commit the changes to the database
         db.session.commit()
